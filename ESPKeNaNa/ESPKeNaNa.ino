@@ -102,6 +102,7 @@ void handleConfig(){
 }
 
 boolean connectWifi(){
+  WiFi.disconnect();
   WiFi.setAutoConnect(false);
   WiFi.setAutoReconnect(false);
   if (!SPIFFS.begin()) {
@@ -134,16 +135,16 @@ boolean connectWifi(){
 }
 
 void clearWifiInfo(){
-  if (!ssid || *ssid == 0x00){
+  if (ssid && *ssid != 0x00){
     delete[] ssid;
   }
-  if (!password || *password == 0x00){
+  if (password && *password != 0x00){
     delete[] password;
   }
 }
 
 void clearHost(){
-  if (!host || *host == 0x00){
+  if (host && *host != 0x00){
     delete[] host;
   }
 }
@@ -151,7 +152,6 @@ void clearHost(){
 void setupAPSTA(){
   WiFi.mode(WIFI_AP_STA);
   WiFi.setPhyMode(WIFI_PHY_MODE_11N);
-  /* You can remove the password parameter if you want the AP to be open. */
   
   Serial.print("Setup access point");
   
@@ -168,7 +168,7 @@ void setupAPSTA(){
 
 void setup() {
   Serial.begin(115200);
-  delay(3000);
+  delay(1000);
 
   setupAPSTA();
   
@@ -182,11 +182,8 @@ WiFiClient sendClient;
 boolean connected = false;
 
 void loop() {
-  delay(1000);
+  delay(300);
   server.handleClient();
-  
-  int sec = millis() / 1000;
-  Serial.println(sec);
 
   if (conWifiStt){
     Serial.println("Start check send client");
