@@ -3,7 +3,7 @@
 #include <ESP8266WebServer.h>
 #include "FS.h"
 
-//Link config http://192.168.4.1/config?ssid=Icosmetic.vn&pass=KHVB2015.&host=192.168.1.69 
+//Link config http://192.168.4.1/config?ssid=Icosmetic.vn&pass=00000000&host=192.168.1.69 
 /* Set these to your desired credentials. */
 const char *myssid = "ESPKeNaNa";
 const char *mypassword = "kennguyen";
@@ -54,7 +54,7 @@ bool loadConfig() {
 }
 
 void handleRoot() {
-  String mes = "You are connected to " + String(myssid);
+  String mes = "Link config http://192.168.4.1/config?ssid=TenWifi&pass=MatKhau&host=192.168.1.69";
   server.send ( 200, "text/html", mes );
 
 }
@@ -168,7 +168,7 @@ void setupAPSTA(){
 
 void setup() {
   Serial.begin(115200);
-  delay(1000);
+  delay(3000);
 
   setupAPSTA();
   
@@ -180,6 +180,22 @@ int pin = 0;
 const int httpPort = 6690;
 WiFiClient sendClient;
 boolean connected = false;
+
+void testPIR(){
+  int pin = 0;
+  long t = 0;
+  while(true){
+    if (pin != digitalRead(5)){
+      pin = 1 - pin;
+      Serial.print(pin);
+      Serial.print(" : ");
+      t = millis() - t;
+      Serial.println(t);
+      t = millis();  
+    }
+    delay(1);
+  }
+}
 
 void loop() {
   delay(300);
@@ -193,13 +209,26 @@ void loop() {
       Serial.println("Connected to " + String(host));
     }
     Serial.println("Start check GPIO5");
-    if (sendClient.connected()){
-      if(pin != digitalRead(5)) {
+//    if (sendClient.connected()){
+//      if(pin != digitalRead(5)) {
+//        pin = 1 - pin;
+//        String a = String(pin);
+//        Serial.println(a);
+//        sendClient.print(a + "\n");
+//      }
+//    }
+    long t = millis();
+    while(sendClient.connected()){
+      if (pin != digitalRead(5)){
         pin = 1 - pin;
-        String a = String(pin);
-        Serial.println(a);
-        sendClient.print(a + "\n");
+        Serial.print(pin);
+        Serial.print(" : ");
+        t = millis() - t;
+        Serial.println(t);
+        t = millis();  
+        sendClient.print(String(pin) + "\n");
       }
+      delay(1);
     }
   }
 }
